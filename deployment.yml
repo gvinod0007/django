@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssv
+  template:
+    metadata:
+      labels:
+        app: ssv
+    spec:
+      containers:
+      - name: app
+        image: new-django
+        command: ["/bin/sh", "-c"]
+        args: ["python manage.py runserver 0.0.0.0:8000"]
+        imagePullPolicy: IfNotPresent
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ssv-service
+  labels:
+    app: ssv
+spec:
+  selector:
+    app: ssv
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000  # Ensure this matches the port your app is listening on
+
