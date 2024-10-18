@@ -57,7 +57,7 @@ spec:
     spec:
       containers:
       - name: django-sample-container
-        image: 637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest  # Your ECR image
+        image: 637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest # Your ECR image
         ports:
         - containerPort: 8000  # Django runs on port 8000
         env:
@@ -76,10 +76,11 @@ metadata:
   name: django-sample-service
   namespace: default  # Replace if using a different namespace
 spec:
-  selector:
+  type: NodePort  # Set to NodePort for external access
+  selector:   
     app: django-sample
   ports:
     - protocol: TCP
       port: 80  # External access port
       targetPort: 8000  # Django app's internal port
-  type: LoadBalancer  # Expose the service externally (can be NodePort if not using a LoadBalancer)
+      nodePort: 30000  # Optional: specify a node port, or let Kubernetes assign one

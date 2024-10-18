@@ -26,7 +26,8 @@ SECRET_KEY = 'django-insecure-idt=ia)om@@t=e1*py)1#y_wvn4h45c((64^_a&7r04frh%6)c
 DEBUG = True
 
 # Allowed hosts for Django
-ALLOWED_HOSTS = ['15.206.165.113', 'another-domain.com', 'localhost']
+ALLOWED_HOSTS = ['15.206.165.113', '3.6.210.248', 'another-domain.com', 'localhost']
+
 
 
 # Application definition
