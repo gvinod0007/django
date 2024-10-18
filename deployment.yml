@@ -45,7 +45,7 @@ metadata:
   labels:
     app: django-sample
 spec:
-  replicas: 1  # Number of pods
+  replicas: 1
   selector:
     matchLabels:
       app: django-sample
@@ -56,14 +56,21 @@ spec:
     spec:
       containers:
       - name: django-sample-container
-        image: 637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest  # ECR image
+        image: 637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest  # Replace with your ECR image
         ports:
-        - containerPort: 8000  # Port your Django app listens on
+        - containerPort: 8000
         env:
         - name: DJANGO_ENV
-          value: "production"
+          value: "production"  # Set your environment to production
         - name: DEBUG
-          value: "False"
+          value: "False"  # Disable debug mode in production
+        - name: SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: django-secret 
+              key: secret_key  
+        command: ["/bin/sh", "-c"]  # Optional for debugging
+        args: ["python manage.py runserver 0.0.0.0:8000"]  # Command to start your Django app
 
 ---
 apiVersion: v1
@@ -74,11 +81,9 @@ metadata:
     app: django-sample
 spec:
   selector:
-    app: django-sample  # Must match labels in the deployment
+    app: django-sample  # Ensure this matches the deployment's labels
   ports:
     - protocol: TCP
-      port: 80  # External service port
+      port: 80  # External port to access the service
       targetPort: 8000  # Port your app listens on
-  type: ClusterIP  # Internal service type
-
-
+  type: NodePort  # This allows external access to your service
