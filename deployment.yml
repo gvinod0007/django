@@ -42,10 +42,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: django-sample-deployment
+  namespace: default  # Replace if using a different namespace
   labels:
     app: django-sample
 spec:
-  replicas: 1
+  replicas: 1  # You can adjust replicas as needed
   selector:
     matchLabels:
       app: django-sample
@@ -56,34 +57,29 @@ spec:
     spec:
       containers:
       - name: django-sample-container
-        image: 637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest  # Replace with your ECR image
+        image: 637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest  # Your ECR image
         ports:
-        - containerPort: 8000
+        - containerPort: 8000  # Django runs on port 8000
         env:
-        - name: DJANGO_ENV
-          value: "production"  # Set your environment to production
         - name: DEBUG
-          value: "False"  # Disable debug mode in production
+          value: "False"
         - name: SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: django-secret 
-              key: secret_key  
-        command: ["/bin/sh", "-c"]  # Optional for debugging
-        args: ["python manage.py runserver 0.0.0.0:8000"]  # Command to start your Django app
+          value: "your-secret-key"  # Replace with your Django SECRET_KEY
+        command: ["/bin/sh", "-c"]
+        args: ["python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+        imagePullPolicy: Always
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: django-sample-service
-  labels:
-    app: django-sample
+  namespace: default  # Replace if using a different namespace
 spec:
   selector:
-    app: django-sample  # Ensure this matches the deployment's labels
+    app: django-sample
   ports:
     - protocol: TCP
-      port: 80  # External port to access the service
-      targetPort: 8000  # Port your app listens on
-  type: NodePort  # This allows external access to your service
+      port: 80  # External access port
+      targetPort: 8000  # Django app's internal port
+  type: LoadBalancer  # Expose the service externally (can be NodePort if not using a LoadBalancer)
