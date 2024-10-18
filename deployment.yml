@@ -1,38 +1,84 @@
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: ssv
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: ssv
+#   template:
+#     metadata:
+#       labels:
+#         app: ssv
+#     spec:
+#       containers:
+#       - name: app
+#         image: new-django
+#         command: ["/bin/sh", "-c"]
+#         args: ["python manage.py runserver 0.0.0.0:8000"]
+#         imagePullPolicy: IfNotPresent
+
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: ssv-service
+#   labels:
+#     app: ssv
+# spec:
+#   selector:
+#     app: ssv
+#   type: NodePort
+#   ports:
+#     - protocol: TCP
+#       port: 80
+#       targetPort: 8000  # Ensure this matches the port your app is listening on
+
+
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: ssv
+  name: django-sample-deployment
+  labels:
+    app: django-sample
 spec:
-  replicas: 1
+  replicas: 1  # Number of pods
   selector:
     matchLabels:
-      app: ssv
+      app: django-sample
   template:
     metadata:
       labels:
-        app: ssv
+        app: django-sample
     spec:
       containers:
-      - name: app
-        image: new-django
-        command: ["/bin/sh", "-c"]
-        args: ["python manage.py runserver 0.0.0.0:8000"]
-        imagePullPolicy: IfNotPresent
-
+      - name: django-sample-container
+        image: 637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest  # ECR image
+        ports:
+        - containerPort: 8000  # Port your Django app listens on
+        env:
+        - name: DJANGO_ENV
+          value: "production"
+        - name: DEBUG
+          value: "False"
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: ssv-service
+  name: django-sample-service
   labels:
-    app: ssv
+    app: django-sample
 spec:
   selector:
-    app: ssv
-  type: NodePort
+    app: django-sample  # Must match labels in the deployment
   ports:
     - protocol: TCP
-      port: 80
-      targetPort: 8000  # Ensure this matches the port your app is listening on
+      port: 80  # External service port
+      targetPort: 8000  # Port your app listens on
+  type: ClusterIP  # Internal service type
+
 
