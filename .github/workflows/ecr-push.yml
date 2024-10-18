@@ -31,5 +31,5 @@ jobs:
 
     - name: Push Docker image to Amazon ECR
       run: |
-        docker push 637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest  # Push the image to ECR
+        docker push 6637423378523.dkr.ecr.ap-south-1.amazonaws.com/django/sample:latest  # Push the image to ECR
 
